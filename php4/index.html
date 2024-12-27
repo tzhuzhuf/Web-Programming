@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Форма ввода данных</title>
+    <script>
+        // Функция для отправки данных на сервер с использованием AJAX
+        function sendData() {
+            // Получаем значения из формы
+            const name = document.getElementById("name").value;
+            const age = document.getElementById("age").value;
+            const gender = document.querySelector('input[name="gender"]:checked')?.value;
+            const color = document.getElementById("color").value;
+
+            // Проверяем, что все поля заполнены
+            if (!name || !age || !gender || !color) {
+                alert("Пожалуйста, заполните все поля.");
+                return;
+            }
+
+            // Создаем объект с данными
+            const data = {
+                name: name,
+                age: age,
+                gender: gender,
+                color: color
+            };
+
+            // Создаем новый XMLHttpRequest
+            const xhr = new XMLHttpRequest();
+
+            // Открываем соединение (POST запрос)
+            xhr.open("POST", "process.php", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+
+            // Отправляем данные на сервер
+            xhr.send(JSON.stringify(data));
+
+            // Обработка ответа от сервера
+            xhr.onload = function() {
+                if (xhr.status == 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    // Выводим результат на страницу
+                    document.getElementById("result").innerHTML = `
+                        <h3>Результат:</h3>
+                        <p>Имя: ${response.name}</p>
+                        <p>Возраст: ${response.age}</p>
+                        <p>Пол: ${response.gender}</p>
+                        <p>Любимый цвет: ${response.color}</p>
+                    `;
+                } else {
+                    alert("Произошла ошибка: " + xhr.status);
+                }
+            };
+        }
+    </script>
+</head>
+<body>
+    <h1>Форма ввода данных</h1>
+    <form onsubmit="event.preventDefault(); sendData();">
+        <label for="name">Имя:</label>
+        <input type="text" id="name" name="name"><br><br>
+
+        <label for="age">Возраст:</label>
+        <input type="number" id="age" name="age"><br><br>
+
+        <label>Пол:</label>
+        <input type="radio" id="male" name="gender" value="Мужской">
+        <label for="male">Мужской</label>
+        <input type="radio" id="female" name="gender" value="Женский">
+        <label for="female">Женский</label><br><br>
+
+        <label for="color">Любимый цвет:</label>
+        <select id="color" name="color">
+            <option value="Красный">Красный</option>
+            <option value="Зеленый">Зеленый</option>
+            <option value="Синий">Синий</option>
+            <option value="Желтый">Желтый</option>
+        </select><br><br>
+
+        <button type="submit">Отправить</button>
+    </form>
+
+    <div id="result"></div>
+</body>
+</html>
